@@ -7,15 +7,17 @@
 
 #include "datatypes.h"
 
-#define AKTPIN_OUT    5   //RS485 Modul an RX/TX
-#define AKTPIN_IN_1   2   //RS485 Modul an RX1/TX1
-#define AKTPIN_IN_2   3   //RS485 Modul an RX2/TX2
-#define AKTPIN_IN_3   4   //Rs485 Modul an RX3/TX3
+#define RS485_ACTIVATION_PIN_OUT    5   //RS485 Modul an RX/TX
+#define RS485_ACTIVATION_PIN_IN_1   2   //RS485 Modul an RX1/TX1
+#define RS485_ACTIVATION_PIN_IN_2   3   //RS485 Modul an RX2/TX2
+#define RS485_ACTIVATION_PIN_IN_3   4   //Rs485 Modul an RX3/TX3
 
+// message length in byte
 #define MESSAGE_LENGTH 10
 
 #define RS485_BAUD_RATE 9600
-#define RS485_TIMEOUT 10 // in ms
+// in ms
+#define RS485_TIMEOUT 10
 
 typedef enum {
     TYPE_START = 0,
@@ -32,6 +34,7 @@ typedef enum {
     MESSAGE_NEW,
     MESSAGE_CONSUMED,
     MESSAGE_CORRUPTED,
+    MESSAGE_OLD,
     STATUS_END = 255,
 } MESSAGE_STATUS;
 

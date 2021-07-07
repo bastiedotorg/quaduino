@@ -51,6 +51,9 @@ void sendRs485() {
 
 void rcvRs485 (){
     MESSAGE buf = getSamplingMessage(0, XCONMA);
+    if(buf.payload.asUint == 4711) {
+        led_high();
+    }
 };
 
 T_JOB initJobTable[NUM_INIT_JOBS] = {
@@ -95,7 +98,7 @@ void setup() {
 void loop() {
 // write your code here
     runScheduler(activeJobTable, numJobs);
-    Serial.println("Looping\n");
+   // Serial.println("Looping\n");
 
 }
 

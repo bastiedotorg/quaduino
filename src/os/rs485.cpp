@@ -112,6 +112,22 @@ void cyclicCheckMessages() {
 }
 
 void rs485Init(){
+    // set Serial to output and activate
+    pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
+
+    // set rs485 to read
+    pinMode(RS485_ACTIVATION_PIN_IN_1, OUTPUT);
+    pinMode(RS485_ACTIVATION_PIN_IN_2, OUTPUT);
+    pinMode(RS485_ACTIVATION_PIN_IN_3, OUTPUT);
+
+    // set rs485 to write (serial)
+    digitalWrite(RS485_ACTIVATION_PIN_OUT, HIGH);
+
+    // set rs485 to read (serial1-3)
+    digitalWrite(RS485_ACTIVATION_PIN_IN_1, LOW);
+    digitalWrite(RS485_ACTIVATION_PIN_IN_2, LOW);
+    digitalWrite(RS485_ACTIVATION_PIN_IN_3, LOW);
+
 
     Serial.setTimeout(RS485_TIMEOUT);
     Serial1.setTimeout(RS485_TIMEOUT);
