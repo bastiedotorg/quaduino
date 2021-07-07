@@ -29,5 +29,9 @@ add_custom_target(
     COMMAND platformio -c clion run --target debug "$<$<NOT:$<CONFIG:All>>:-e${CMAKE_BUILD_TYPE}>"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+include_directories(.pio/libdeps)
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/src/os")
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/database.cpp include/database.h src/scheduler.cpp src/ostime.cpp include/ostime.h include/scheduler.h src/xsynchro.cpp include/xsynchro.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/database.cpp include/database.h src/scheduler.cpp src/ostime.cpp include/ostime.h include/scheduler.h src/xsynchro.cpp include/xsynchro.h src/como2.cpp src/xlane.cpp include/xlane.h src/inconma.cpp include/inconma.h src/spy.cpp include/spy.h)

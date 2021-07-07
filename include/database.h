@@ -36,6 +36,7 @@ enum DBPOSITIONS_INDI {
     Z_SYN_NAVAIL_2,
     Z_SYN_NAVAIL_3,
     Z_SYN_NAVAIL_4,
+    X_XLANE,
 };
 
 

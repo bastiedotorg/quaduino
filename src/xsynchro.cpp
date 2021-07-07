@@ -8,15 +8,15 @@
 #define SYN_DEFAULT -1
 #define CORRECT_SYN_MESSAGE 15
 
-typedef struct T_STATE {
+typedef struct {
     bool fail;
     bool navail;
-};
+} TT_STATE;
 
-typedef struct T_STATUS {
+typedef struct {
     bool off;
     bool iso;
-};
+} TT_STATUS;
 
 bool getSynMessage(int lane) {
     return true;
@@ -29,7 +29,7 @@ void transmitSynMessage() {
     }
 }
 
-void xsynchro(T_STATUS *status, T_STATE *zsyn) {
+void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     int i;
     unsigned long ct;
     int xsyn[NUM_LANES];
@@ -107,8 +107,8 @@ void xsynchro(T_STATUS *status, T_STATE *zsyn) {
 
 void job_xsynchro() {
     int i;
-    T_STATE state[NUM_LANES];
-    T_STATUS status[NUM_LANES];
+    TT_STATE state[NUM_LANES];
+    TT_STATUS status[NUM_LANES];
     for (i = 0; i < NUM_LANES; i++) {
         status[i].off = readDBcss(STATUS_OFF_1 + i);
         status[i].iso = readDBcss(STATUS_ISO_1 + i);

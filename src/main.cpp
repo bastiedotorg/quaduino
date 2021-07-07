@@ -3,21 +3,26 @@
 #include "scheduler.h"
 #include "ostime.h"
 #include "xsynchro.h"
+#include "spy.h"
+
+#include "rs485.h"
 
 #define NUM_JOBS 6
-#define NUM_INIT_JOBS 6
+#define NUM_INIT_JOBS 7
 
 T_JOB *activeJobTable;
 long numJobs;
 
 void led_high() {
-    digitalWrite(7, HIGH); // sets the digital pin 13 on
-
+    digitalWrite(45, HIGH); // sets the digital pin 13 on
+    digitalWrite(47, HIGH);
+    digitalWrite(49, HIGH);
 }
 
 void led_low() {
-    digitalWrite(7, LOW); // sets the digital pin 13 on
-
+    digitalWrite(45, LOW);
+    digitalWrite(47, LOW);
+    digitalWrite(49, LOW);
 }
 
 void initSerial() {
@@ -26,34 +31,58 @@ void initSerial() {
 
 }
 
+void readPoti() {
+    int val;
+    val = analogRead(A2);
+    Serial.print(val);
+}
+
 void initLed() {
     pinMode(7, OUTPUT);
 }
+
+void initPoti() {
+    pinMode(A2, INPUT);
+}
+
+void sendRs485() {
+    sendMessageUint64(4711, XCONMA);
+}
+
+void rcvRs485 (){
+    MESSAGE buf = getSamplingMessage(0, XCONMA);
+};
 
 T_JOB initJobTable[NUM_INIT_JOBS] = {
         {.start_time = 0, .stop_time = 0, .job_function = &initDB },
         {.start_time = 100, .stop_time = 0, .job_function = &initSerial },
         {.start_time = 200, .stop_time = 0, .job_function = &initLed },
-        {.start_time = 300, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 300, .stop_time = 0, .job_function = &initPoti },
+        {.start_time = 400, .stop_time = 0, .job_function = &init_spy },
         {.start_time = 500, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 500, .stop_time = 0, .job_function = &rs485Init },
+};
+T_JOB runJobTable[NUM_JOBS] = {
+        {.start_time = 0, .stop_time = 0, .job_function = &sendRs485 },
+        {.start_time = 100, .stop_time = 0, .job_function = &rcvRs485 },
+        {.start_time = 200, .stop_time = 0, .job_function = &led_high },
+        {.start_time = 300, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 400, .stop_time = 0, .job_function = &led_high },
+        {.start_time = 500, .stop_time = 0, .job_function = &readPoti },
 };
 
 
-T_JOB runJobTable[NUM_JOBS] = {
+T_JOB runJobTable2[NUM_JOBS] = {
         {.start_time = 0, .stop_time = 0, .job_function = &job_xsynchro },
         {.start_time = 100, .stop_time = 0, .job_function = &reset_time },
         {.start_time = 200, .stop_time = 0, .job_function = &led_high },
         {.start_time = 300, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 500, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 400, .stop_time = 0, .job_function = &led_high },
+        {.start_time = 500, .stop_time = 0, .job_function = &readPoti },
 };
 
-void initDatabases() {
-    initDB();
-}
-void setup() {
 
+void setup() {
     activeJobTable = initJobTable;
     numJobs = NUM_INIT_JOBS;
     runScheduler(activeJobTable, numJobs);
@@ -61,13 +90,12 @@ void setup() {
 
     numJobs = NUM_JOBS;
     activeJobTable = runJobTable;
-
-
 }
 
 void loop() {
 // write your code here
     runScheduler(activeJobTable, numJobs);
-    Serial.write("loop");
+    Serial.println("Looping\n");
+
 }
 
