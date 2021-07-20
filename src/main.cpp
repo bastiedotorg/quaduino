@@ -27,18 +27,22 @@ void led_low() {
 
 void initSerial() {
     Serial.begin(9600);
-    Serial.write("begin");
+    //Serial.write("standardSerial");
 
 }
 
 void readPoti() {
-    int val;
+    int val = 17;
     val = analogRead(A2);
     Serial.print(val);
 }
 
+
 void initLed() {
     pinMode(7, OUTPUT);
+    pinMode(45, OUTPUT);
+    pinMode(47, OUTPUT);
+    pinMode(49, OUTPUT);
 }
 
 void initPoti() {
@@ -50,8 +54,16 @@ void sendRs485() {
 }
 
 void rcvRs485 (){
-    MESSAGE buf = getSamplingMessage(0, XCONMA);
+    /*MESSAGE buf = getSamplingMessage(0, XCONMA);
     if(buf.payload.asUint == 4711) {
+        led_high();
+    }
+    */
+    MESSAGE buf1;
+    MESSAGE buf2;
+    receiveMessage(0, &buf1);
+    receiveMessage(1, &buf2);
+    if(buf1.payload.asUint == 4711 || buf2.payload.asUint == 4711){
         led_high();
     }
 };
@@ -62,16 +74,16 @@ T_JOB initJobTable[NUM_INIT_JOBS] = {
         {.start_time = 200, .stop_time = 0, .job_function = &initLed },
         {.start_time = 300, .stop_time = 0, .job_function = &initPoti },
         {.start_time = 400, .stop_time = 0, .job_function = &init_spy },
-        {.start_time = 500, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 500, .stop_time = 0, .job_function = &rs485Init },
+        {.start_time = 500, .stop_time = 900, .job_function = &led_high },
+        {.start_time = 900, .stop_time = 0, .job_function = &rs485Init },
 };
 T_JOB runJobTable[NUM_JOBS] = {
-        {.start_time = 0, .stop_time = 0, .job_function = &sendRs485 },
-        {.start_time = 100, .stop_time = 0, .job_function = &rcvRs485 },
-        {.start_time = 200, .stop_time = 0, .job_function = &led_high },
-        {.start_time = 300, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 0, .job_function = &led_high },
-        {.start_time = 500, .stop_time = 0, .job_function = &readPoti },
+        {.start_time = 0, .stop_time = 50, .job_function = &sendRs485 },
+        {.start_time = 100, .stop_time = 150, .job_function = &rcvRs485 },
+        {.start_time = 200, .stop_time = 400, .job_function = &led_low },
+        {.start_time = 400, .stop_time = 600, .job_function = &led_low },
+        {.start_time = 600, .stop_time = 800, .job_function = &led_low },
+        {.start_time = 800, .stop_time = 0, .job_function = &reset_time },
 };
 
 
@@ -83,6 +95,7 @@ T_JOB runJobTable2[NUM_JOBS] = {
         {.start_time = 400, .stop_time = 0, .job_function = &led_high },
         {.start_time = 500, .stop_time = 0, .job_function = &readPoti },
 };
+
 
 
 void setup() {
@@ -98,7 +111,7 @@ void setup() {
 void loop() {
 // write your code here
     runScheduler(activeJobTable, numJobs);
-   // Serial.println("Looping\n");
+    //Serial.println("Looping\n");
 
 }
 
