@@ -93,7 +93,7 @@ T_JOB runJobTable2[NUM_JOBS] = {
         {.start_time = 200, .stop_time = 0, .job_function = &led_high },
         {.start_time = 300, .stop_time = 0, .job_function = &led_low },
         {.start_time = 400, .stop_time = 0, .job_function = &led_high },
-        {.start_time = 500, .stop_time = 0, .job_function = &readPoti },
+        {.start_time = 500, .stop_time = 0, .job_function = &led_low },
 };
 
 
@@ -105,7 +105,7 @@ void setup() {
 
 
     numJobs = NUM_JOBS;
-    activeJobTable = runJobTable;
+    activeJobTable = runJobTable2;
 }
 
 void loop() {

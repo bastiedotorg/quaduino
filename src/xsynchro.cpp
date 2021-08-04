@@ -3,6 +3,8 @@
 //
 #include "database.h"
 #include "ostime.h"
+#include "rs485.h"
+#include "datatypes.h"
 
 #define NUM_LANES 4
 #define SYN_DEFAULT -1
@@ -18,8 +20,10 @@ typedef struct {
     bool iso;
 } TT_STATUS;
 
-bool getSynMessage(int lane) {
-    return true;
+SINT64 getSynMessage(int lane) {
+    MESSAGE synMsg;
+    receiveMessage(lane, &synMsg);
+    return synMsg.payload.asInt;
 }
 
 void transmitSynMessage() {
@@ -27,6 +31,7 @@ void transmitSynMessage() {
     for (i = 0; i < NUM_LANES; i++) {
 
     }
+    sendMessageUint64(CORRECT_SYN_MESSAGE, XSYNCHRO);
 }
 
 void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
