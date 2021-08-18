@@ -49,9 +49,10 @@ UINT8 crc8(UINT8 const* data, UINT8 len)
 
 SINT8 sendMessage(UINT8* message) {
     for(UINT8 i=0;i<MESSAGE_LENGTH;i++) {
-        if(Serial.availableForWrite() > 0) {
-            Serial.write(message[i]);
+        if(Serial3.availableForWrite() > 0) {
+            Serial3.write(message[i]);
         } else {
+            Serial.println("error!");
             return TRANSMIT_ERR;
         }
     }
@@ -67,6 +68,9 @@ SINT8 sendMessageUint64(UINT64 payload, MESSAGE_TYPE messageType){
 #define MODULE_3 2
 
 SINT8 receiveMessage(UINT8 moduleId, MESSAGE* buffer) {
+    buffer->payload.asInt = -1;
+    buffer->messageStatus = MESSAGE_EMPTY;
+
     switch(moduleId) {
         case MODULE_1:
             return Serial1.readBytes((SINT8*) buffer, MESSAGE_LENGTH);
@@ -113,7 +117,7 @@ void cyclicCheckMessages() {
 
 void rs485Init(){
     // set Serial to output and activate
-    pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
+    //pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
 
     // set rs485 to read
     pinMode(RS485_ACTIVATION_PIN_IN_1, OUTPUT);
@@ -121,20 +125,20 @@ void rs485Init(){
     pinMode(RS485_ACTIVATION_PIN_IN_3, OUTPUT);
 
     // set rs485 to write (serial)
-    digitalWrite(RS485_ACTIVATION_PIN_OUT, HIGH);
+    //digitalWrite(RS485_ACTIVATION_PIN_OUT, HIGH);
 
     // set rs485 to read (serial1-3)
     digitalWrite(RS485_ACTIVATION_PIN_IN_1, LOW);
     digitalWrite(RS485_ACTIVATION_PIN_IN_2, LOW);
-    digitalWrite(RS485_ACTIVATION_PIN_IN_3, LOW);
+    digitalWrite(RS485_ACTIVATION_PIN_IN_3, HIGH);
 
 
-    Serial.setTimeout(RS485_TIMEOUT);
+  //  Serial.setTimeout(RS485_TIMEOUT);
     Serial1.setTimeout(RS485_TIMEOUT);
     Serial2.setTimeout(RS485_TIMEOUT);
     Serial3.setTimeout(RS485_TIMEOUT);
 
-    Serial.begin(RS485_BAUD_RATE);
+    //Serial.begin(RS485_BAUD_RATE);
 
     Serial1.begin(RS485_BAUD_RATE);
     Serial2.begin(RS485_BAUD_RATE);

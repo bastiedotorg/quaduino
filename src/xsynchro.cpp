@@ -27,10 +27,6 @@ SINT64 getSynMessage(int lane) {
 }
 
 void transmitSynMessage() {
-    int i;
-    for (i = 0; i < NUM_LANES; i++) {
-
-    }
     sendMessageUint64(CORRECT_SYN_MESSAGE, XSYNCHRO);
 }
 
@@ -38,20 +34,17 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     int i;
     unsigned long ct;
     int xsyn[NUM_LANES];
-    bool zsynfail[NUM_LANES];
     bool presyn_end = false;
     bool syn_end = false;
     int nCorrect = 0;
     int nStatusOk = 0;
     int nCorrectMin = 0;
-    long TOPreSyn = 200;
-    long TOSyn = 100;
+    long TOPreSyn = 1000;
+    long TOSyn = 800;
 
     ct = get_time();
-
-
     for (i = 0; i < NUM_LANES; i++) {
-        zsynfail[i] = true;
+        zsyn[i].fail = true;
         xsyn[i] = SYN_DEFAULT;
         if (!status[i].off && !status[i].iso) {
             nStatusOk++;
@@ -65,7 +58,7 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     while (!presyn_end) {
         //ct++;
         for (i = 0; i < NUM_LANES; i++) {
-            xsyn[i] = getSynMessage(i);
+            xsyn[i] = (int) getSynMessage(i);
             if (xsyn[i] == CORRECT_SYN_MESSAGE) {
                 zsyn[i].fail = false;
                 nCorrect++;
@@ -79,14 +72,15 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     transmitSynMessage();
     ct = get_time();
     if (nStatusOk >= 4) {
-        nCorrectMin = 2;
+        nCorrectMin = 1;
     } else if (nStatusOk >= 2) {
         nCorrectMin = 1;
     }
 
     while (!syn_end) {
         for (i = 0; i < NUM_LANES; i++) {
-            xsyn[i] = getSynMessage(i);
+            xsyn[i] = (int) getSynMessage(i);
+
             if (xsyn[i] == CORRECT_SYN_MESSAGE) {
                 zsyn[i].fail = false;
                 nCorrect++;
@@ -97,15 +91,15 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
         }
     }
     for(i=0;i<NUM_LANES;i++) {
-        if(!zsynfail[i]) { // sf(i) hat korrekt synchronisiert
+        if(zsyn[i].fail == false) { // sf(i) hat korrekt synchronisiert
             zsyn[i].navail = false;
             zsyn[i].fail = false;
-        } else if(zsynfail[i] && xsyn[i] == SYN_DEFAULT) { // sf(i) hat kein xsyn gesendet -> stromlos
+        } else if(zsyn[i].fail && xsyn[i] == SYN_DEFAULT) { // sf(i) hat kein xsyn gesendet -> stromlos
             zsyn[i].navail = true;
             zsyn[i].fail = false;
         } else { // sf(i) hat korrumpiertes xsyn gesendet
             zsyn[i].navail = true;
-            zsyn[i].fail = false;
+            zsyn[i].fail = true;
         }
     }
 }
@@ -123,4 +117,5 @@ void job_xsynchro() {
         writeDBindi(Z_SYN_FAIL_1+i, state[i].fail);
         writeDBindi(Z_SYN_NAVAIL_1+i, state[i].navail);
     }
+
 }

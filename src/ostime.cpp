@@ -10,5 +10,5 @@ void reset_time() {
 }
 
 unsigned long get_time() {
-    return millis() - GLOBAL_TIME;
+    return (millis() - GLOBAL_TIME)/CYCLE_TIME;
 }
