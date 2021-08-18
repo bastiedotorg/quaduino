@@ -4,6 +4,7 @@
 
 #ifndef QUADIUNO_OSTIME_H
 #define QUADIUNO_OSTIME_H
+#define CYCLE_TIME 1;
 
 void reset_time();
 

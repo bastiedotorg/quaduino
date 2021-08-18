@@ -5,4 +5,5 @@
 #ifndef QUADIUNO_SPY_H
 #define QUADIUNO_SPY_H
 void init_spy();
+void step_spy();
 #endif //QUADIUNO_SPY_H

@@ -33,5 +33,7 @@ include_directories(.pio/libdeps)
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src/os")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
+include_directories("external/WIZ_Ethernet_Library/Arduino IDE 1.5.x/Ethernet/src/")
 
 add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/os/pinprog.cpp include/pinprog.h src/database.cpp include/database.h src/scheduler.cpp src/ostime.cpp include/ostime.h include/scheduler.h src/xsynchro.cpp include/xsynchro.h src/como2.cpp src/xlane.cpp include/xlane.h src/inconma.cpp include/inconma.h src/spy.cpp include/spy.h)

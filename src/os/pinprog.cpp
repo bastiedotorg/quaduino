@@ -21,13 +21,21 @@ typedef struct {
 void initPinProg() {
     PIN_STATUS pinProg;
 
-    pinMode(PIN_PROG_1, INPUT);
-    pinMode(PIN_PROG_2, INPUT);
-    pinMode(PIN_PROG_3, INPUT);
+    pinMode(PIN_PROG_1, INPUT_PULLUP);
+    pinMode(PIN_PROG_2, INPUT_PULLUP);
+    pinMode(PIN_PROG_3, INPUT_PULLUP);
 
-    pinProg.num0 = digitalRead(PIN_PROG_1);
-    pinProg.num1 = digitalRead(PIN_PROG_2);
-    pinProg.num2 = digitalRead(PIN_PROG_3);
+    pinMode(PIN_PROG_PWR_1, OUTPUT);
+    pinMode(PIN_PROG_PWR_2, OUTPUT);
+    pinMode(PIN_PROG_PWR_3, OUTPUT);
+
+    digitalWrite(PIN_PROG_PWR_1, LOW);
+    digitalWrite(PIN_PROG_PWR_2, LOW);
+    digitalWrite(PIN_PROG_PWR_3, LOW);
+
+    pinProg.num0 = !digitalRead(PIN_PROG_1);
+    pinProg.num1 = !digitalRead(PIN_PROG_2);
+    pinProg.num2 = !digitalRead(PIN_PROG_3);
     pinProg.num3 = 0;
     pinProg.num4 = 0;
     pinProg.num5 = 0;

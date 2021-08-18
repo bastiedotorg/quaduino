@@ -9,8 +9,10 @@
 #include "rs485.h"
 #include <SPI.h>
 #include <Ethernet.h>
+#include <pinprog.h>
+
 #define NUM_JOBS 6
-#define NUM_INIT_JOBS 7
+#define NUM_INIT_JOBS 8
 
 T_JOB *activeJobTable;
 long numJobs;
@@ -90,6 +92,7 @@ void rcvRs485 (){
 T_JOB initJobTable[NUM_INIT_JOBS] = {
         {.start_time = 0, .stop_time = 0, .job_function = &initDB },
         {.start_time = 100, .stop_time = 0, .job_function = &initSerial },
+        {.start_time = 100, .stop_time = 0, .job_function = &initPinProg },
         {.start_time = 200, .stop_time = 0, .job_function = &initLed },
         {.start_time = 300, .stop_time = 0, .job_function = &initPoti },
         {.start_time = 400, .stop_time = 0, .job_function = &init_spy },
@@ -111,7 +114,7 @@ T_JOB runJobTable2[NUM_JOBS] = {
         {.start_time = 0, .stop_time = 0, .job_function = &reset_time },
         {.start_time = 200, .stop_time = 0, .job_function = &led_high },
         {.start_time = 300, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 0, .job_function = &led_high },
+        {.start_time = 400, .stop_time = 0, .job_function = &step_spy },
         {.start_time = 500, .stop_time = 0, .job_function = &led_low },
 };
 
