@@ -5,8 +5,14 @@
 #include <Arduino.h>
 #include "pinprog.h"
 
+/**
+ * stores the module ID
+ */
 SINT8 moduleIdentifier = 0;
 
+/**
+ * 8-bit field to store result of pinprog and to calculate the resulting module ID
+ */
 typedef struct {
     unsigned int num0 : 1;
     unsigned int num1 : 1;
@@ -18,6 +24,9 @@ typedef struct {
     unsigned int num7 : 1;
 } PIN_STATUS;
 
+/**
+ *  enables programming the device's module ID with digital pins (dip switches)
+ */
 void initPinProg() {
     PIN_STATUS pinProg;
 
@@ -45,6 +54,12 @@ void initPinProg() {
     moduleIdentifier = *((SINT8*) &pinProg);
 }
 
+
+/**
+ * returns the moduleID from the own device depending on the pinprog on the digitalPins defined in pinprog.h
+ *
+ * @return module ID defined by the pinprog (0-7)
+ */
 SINT8 getModuleId() {
     return moduleIdentifier;
 }
