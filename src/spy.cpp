@@ -7,6 +7,9 @@ byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
 // Set the static IP address to use if the DHCP fails to assign
 
+/**
+ * Set the static IP address to use if the DHCP fails to assign
+ */
 void init_spy() {
     //Ethernet.init(10);  // Most Arduino shields
    // Serial.println("Started Spy...");
@@ -23,6 +26,9 @@ void init_spy() {
 }
 EthernetClient client;
 
+/**
+ *
+ */
 void step_spy() {
     Serial.println(Ethernet.localIP());
 

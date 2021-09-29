@@ -17,13 +17,27 @@
 T_JOB *activeJobTable;
 long numJobs;
 
+/**
+ * prints data on the Serial monitor
+ *
+ * @param data data with type char* to be printed
+ */
 void logData(char* data) {
     Serial.println(data);
 }
+
+/**
+ * prints data on the Serial monitor
+ *
+ * @param data data with type int to be printed
+ */
 void logData(int data) {
     Serial.println(data);
 }
 
+/**
+ * turns on an LED attached to digital Pin 45,47,49 if Z_SYN_NAVAIL of module 1-3 is false
+ */
 void led_high() {
     if(readDBindi(Z_SYN_NAVAIL_1) == 0) {
         digitalWrite(47, HIGH);
@@ -49,19 +63,26 @@ void led_low() {
     //digitalWrite(49, LOW);
 }
 
+/**
+ * initializes Serial communication on Serial port
+ */
 void initSerial() {
     Serial.begin(9600);
     //Serial.write("standardSerial");
 
 }
-
+/**
+ * analog read of analog pin A2 and prints the result to the Serial monitor
+ */
 void readPoti() {
     int val = 17;
     val = analogRead(A2);
     Serial.print(val);
 }
 
-
+/**
+ * defines digital Pins 7,45,47,49 as outputs (to connect them to a LED)
+ */
 void initLed() {
     pinMode(7, OUTPUT);
     pinMode(45, OUTPUT);
@@ -69,14 +90,23 @@ void initLed() {
     pinMode(49, OUTPUT);
 }
 
+/**
+ * defines analog Pin A2 as input (to connect a poti)
+ */
 void initPoti() {
     pinMode(A2, INPUT);
 }
 
+/**
+ * callback function for sending test data via RS485
+ */
 void sendRs485() {
     sendMessageUint64(4711, XCONMA);
 }
 
+/**
+ * callback function to recieve messages from to other modules
+ */
 void rcvRs485 (){
     /*MESSAGE buf = getSamplingMessage(0, XCONMA);
     if(buf.payload.asUint == 4711) {
@@ -89,6 +119,9 @@ void rcvRs485 (){
     receiveMessage(1, &buf2);
 };
 
+/**
+ * Job Table for initialisation; to be run once
+ */
 T_JOB initJobTable[NUM_INIT_JOBS] = {
         {.start_time = 0, .stop_time = 0, .job_function = &initDB },
         {.start_time = 100, .stop_time = 0, .job_function = &initSerial },

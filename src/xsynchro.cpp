@@ -10,26 +10,47 @@
 #define SYN_DEFAULT -1
 #define CORRECT_SYN_MESSAGE 15
 
+/**
+ *
+ */
 typedef struct {
     bool fail;
     bool navail;
 } TT_STATE;
 
+/**
+ *
+ */
 typedef struct {
     bool off;
     bool iso;
 } TT_STATUS;
 
+/**
+ *
+ *
+ * @param lane lane from which the syn message was send
+ * @return
+ */
 SINT64 getSynMessage(int lane) {
     MESSAGE synMsg;
     receiveMessage(lane, &synMsg);
     return synMsg.payload.asInt;
 }
 
+/**
+ * transmits the synchronisation message to all other lanes
+ */
 void transmitSynMessage() {
     sendMessageUint64(CORRECT_SYN_MESSAGE, XSYNCHRO);
 }
 
+/**
+ *
+ *
+ * @param status
+ * @param zsyn
+ */
 void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     int i;
     unsigned long ct;
@@ -104,6 +125,9 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     }
 }
 
+/**
+ *
+ */
 void job_xsynchro() {
     int i;
     TT_STATE state[NUM_LANES];

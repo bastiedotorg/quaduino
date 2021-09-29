@@ -5,7 +5,12 @@
 #include "ostime.h"
 #include "scheduler.h"
 
-
+/**
+ *
+ *
+ * @param jobs
+ * @param num_jobs
+ */
 void runScheduler(const T_JOB* jobs, long num_jobs) {
     int service;
     for (service = 0; service < num_jobs; service++) {
