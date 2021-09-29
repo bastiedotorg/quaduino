@@ -12,11 +12,16 @@
 #define RS485_ACTIVATION_PIN_IN_2   3   //RS485 Modul an RX2/TX2
 #define RS485_ACTIVATION_PIN_IN_3   4   //Rs485 Modul an RX3/TX3
 
-// message length in byte
+/**
+ *message length in byte
+ */
 #define MESSAGE_LENGTH 10
 
 #define RS485_BAUD_RATE 9600
-// in ms
+
+/**
+ * in ms
+ */
 #define RS485_TIMEOUT 10
 
 typedef enum {

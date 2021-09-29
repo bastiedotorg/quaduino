@@ -7,7 +7,12 @@
 
 //Serial serialIn1, serialIn2,serialIn3, serialOut;
 
-
+/**
+ * creates a message ready to be sended via RS485 for payloads of UINT64 type
+ * @param payload defines the UINT64 payload to be sended
+ * @param messageType defines type of message (e.g. synchronisation message)
+ * @return MESSAGE including an UINT64 payload and a message type with generated crc
+ */
 MESSAGE prepareMessageUint64(UINT64* payload, MESSAGE_TYPE messageType){
     MESSAGE data;
     data.payload.asUint = *payload;
@@ -16,6 +21,13 @@ MESSAGE prepareMessageUint64(UINT64* payload, MESSAGE_TYPE messageType){
     data.crc = crc8((UINT8*)payload, MESSAGE_LENGTH);
     return data;
 }
+
+/**
+ * creates a message ready to be sended via RS485 for payloads of SINT64 type
+ * @param payload defines the SINT64 payload to be sended
+ * @param messageType defines type of message (e.g. synchronisation message)
+ * @return MESSAGE including an SINT64 payload and a message type with generated crc
+ */
 MESSAGE prepareMessageSint64(SINT64* payload, MESSAGE_TYPE messageType){
     MESSAGE data;
     data.payload.asInt = *payload;
@@ -24,6 +36,13 @@ MESSAGE prepareMessageSint64(SINT64* payload, MESSAGE_TYPE messageType){
     data.messageType = messageType;
     return data;
 }
+
+/**
+ * creates a message ready to be sended via RS485 for payloads of SINT8 type
+ * @param payload defines the SINT8 payload to be sended
+ * @param messageType defines type of message (e.g. synchronisation message)
+ * @return MESSAGE including an SINT8 payload and a message type with generated crc
+ */
 MESSAGE prepareMessageString(SINT8* payload, MESSAGE_TYPE messageType){
 
     MESSAGE data;
@@ -36,6 +55,10 @@ MESSAGE prepareMessageString(SINT8* payload, MESSAGE_TYPE messageType){
     return data;
 }
 
+
+/**
+ * creates crc8 for a new message
+ */
 UINT8 crc8(UINT8 const* data, UINT8 len)
 {
     if (data == nullptr)
@@ -47,6 +70,12 @@ UINT8 crc8(UINT8 const* data, UINT8 len)
     return crc;
 }
 
+
+/**
+ * sends a prepared message via RS485 on SERIAL3 port
+ * @param message
+ * @return -1 if sending was not succesful, 1 if sending was succesful
+ */
 SINT8 sendMessage(UINT8* message) {
     for(UINT8 i=0;i<MESSAGE_LENGTH;i++) {
         if(Serial3.availableForWrite() > 0) {
@@ -59,6 +88,13 @@ SINT8 sendMessage(UINT8* message) {
     return TRANSMIT_OK;
 }
 
+
+/**
+ * prepares and sends a message with UINT64 payload
+ * @param payload UINT64 payload
+ * @param messageType defines the type of the message
+ * @return -1 if sending was not succesful, 1 if sending was succesful
+ */
 SINT8 sendMessageUint64(UINT64 payload, MESSAGE_TYPE messageType){
     MESSAGE msg = prepareMessageUint64(&payload, messageType);
     return sendMessage((UINT8*) &msg);
@@ -67,6 +103,13 @@ SINT8 sendMessageUint64(UINT64 payload, MESSAGE_TYPE messageType){
 #define MODULE_2 1
 #define MODULE_3 2
 
+
+/**
+ * recieves a message from a defined module connected to one of the Serial inputs
+ * @param moduleId defines from which module connected to Serial inputs 1-3 the message is read
+ * @param buffer buffer in which the readed message is written
+ * @return -1 for transmission error and otherwise it returns the number of bytes placed in buffer
+ */
 SINT8 receiveMessage(UINT8 moduleId, MESSAGE* buffer) {
     buffer->payload.asInt = -1;
     buffer->messageStatus = MESSAGE_EMPTY;
@@ -89,6 +132,13 @@ SINT8 receiveMessage(UINT8 moduleId, MESSAGE* buffer) {
 
 MESSAGE messageBuffer[3][MESSAGE_TYPE_COUNT];
 
+
+/**
+ * reads a message from the messageBuffer at a certain target and a certain message type
+ * @param target module ID from which the message was recieved
+ * @param messageType type of the message
+ * @return message read from messageBuffer
+ */
 MESSAGE getSamplingMessage(UINT8 target, MESSAGE_TYPE messageType) {
     return messageBuffer[target][messageType];
 }
@@ -99,6 +149,8 @@ MESSAGE receiveQueuingMessage(UINT8 target, MESSAGE_TYPE messageType) {
     messageBuffer[target][messageType].messageStatus = MESSAGE_CONSUMED;
     return tmpBuf;
 }
+
+
 
 void cyclicCheckMessages() {
     MESSAGE tmpBuf;
@@ -115,6 +167,12 @@ void cyclicCheckMessages() {
     }
 }
 
+/**
+ * initializes rs485 communication via Serial 1-3 by 3 steps:
+ * 1. set rs485 to read (serial 1 & 2) and write (serial3)
+ * 2. set timeout for serial1-3
+ * 3. Serial.begin with defined baud rate for Serial1-3
+ */
 void rs485Init(){
     // set Serial to output and activate
     //pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
