@@ -22,12 +22,9 @@ void init_spy() {
 
    Ethernet.begin(mac, ip);
    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-       Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
    }
    if (Ethernet.linkStatus() == LinkOFF) {
-       Serial.println("Ethernet cable is not connected.");
    }
-//   Ethernet.setTimeout(50);
     client.setConnectionTimeout(50);
 }
 

@@ -24,7 +24,6 @@ long numJobs;
  * @param data data with type char* to be printed
  */
 void logData(char *data) {
-    Serial.println(data);
 }
 
 /**
@@ -33,7 +32,6 @@ void logData(char *data) {
  * @param data data with type int to be printed
  */
 void logData(int data) {
-    Serial.println(data);
 }
 
 /**
@@ -61,7 +59,7 @@ void led_low() {
  * initializes Serial communication on Serial port
  */
 void initSerial() {
-    Serial.begin(9600);
+   // Serial.begin(9600);
     //Serial.write("standardSerial");
 
 }
@@ -72,7 +70,6 @@ void initSerial() {
 void readPoti() {
     int val = 17;
     val = analogRead(A2);
-    Serial.println(val);
     writeDBindi(SENSOR_1, val);
     servo.write(val / 2);
 }
@@ -157,7 +154,6 @@ void setup() {
     numJobs = NUM_INIT_JOBS;
     runScheduler(activeJobTable, numJobs);
 
-    Serial.begin(9600);
     numJobs = NUM_JOBS;
     activeJobTable = runJobTable2;
 }
@@ -167,9 +163,8 @@ long processCounter = 0;
 void loop() {
 // write your code here
     processCounter++;
+    writeDBindi(X_XLANE, processCounter);
     runScheduler(activeJobTable, numJobs);
-    Serial.print("Looping ");
-    Serial.println(processCounter);
 
 }
 

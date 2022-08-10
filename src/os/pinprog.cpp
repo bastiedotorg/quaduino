@@ -52,7 +52,6 @@ void initPinProg() {
     pinProg.num7 = 0;
 
     moduleIdentifier = *((SINT8*) &pinProg);
-    Serial.println(moduleIdentifier);
 
 }
 

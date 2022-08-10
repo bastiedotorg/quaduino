@@ -6,6 +6,7 @@
 #include "rs485.h"
 #include "datatypes.h"
 #include <Arduino.h>
+#include "pinprog.h"
 
 #define NUM_LANES 4
 #define SYN_DEFAULT -1
@@ -36,10 +37,6 @@ typedef struct {
 SINT64 getSynMessage(int lane) {
     MESSAGE synMsg;
     receiveMessage(lane, &synMsg);
-    Serial.print("received message from: ");
-    Serial.print(lane);
-    Serial.print(" ");
-    Serial.println(synMsg.payload.asIntArray[0]);
     return synMsg.payload.asInt;
 }
 
@@ -60,8 +57,8 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     int i;
     unsigned long ct;
     int xsyn[NUM_LANES];
-    bool presyn_end = false;
-    bool syn_end = false;
+    short presyn_end = 0;
+    short syn_end = 0;
     int nCorrect = 0;
     int nStatusOk = 0;
     int nCorrectMin = 0;
@@ -81,7 +78,7 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
     } else if (nStatusOk == 2) {
         nCorrectMin = 1;
     }
-    while (!presyn_end) {
+    while (presyn_end < 2) {
         //ct++;
         for (i = 0; i < NUM_LANES; i++) {
             xsyn[i] = (int) getSynMessage(i);
@@ -91,8 +88,9 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
             }
         }
         if (nCorrect >= nCorrectMin || get_time() - ct > TOPreSyn) {
-            presyn_end = true;
+            presyn_end++;
         }
+        delay(10);
     }
 
     transmitSynMessage();
@@ -103,7 +101,7 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
         nCorrectMin = 1;
     }
 
-    while (!syn_end) {
+    while (syn_end<2) {
         for (i = 0; i < NUM_LANES; i++) {
             xsyn[i] = (int) getSynMessage(i);
 
@@ -113,8 +111,9 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
             }
         }
         if (nCorrect >= nCorrectMin || get_time() - ct > TOSyn) {
-            syn_end = true;
+            syn_end++;
         }
+        delay(10);
     }
     for(i=0;i<NUM_LANES;i++) {
         if (zsyn[i].fail) {
@@ -142,16 +141,8 @@ void job_xsynchro() {
         status[i].off = readDBcss(STATUS_OFF_1 + i);
         status[i].iso = readDBcss(STATUS_ISO_1 + i);
     }
-    status[2].off = 1;
-    status[3].off = 1;
     xsynchro(status, state);
     for (i = 0; i < NUM_LANES; i++) {
-        Serial.print("syn end; i=");
-        Serial.print(i);
-        Serial.print(" fail: ");
-        Serial.print(state[i].fail);
-        Serial.print(" navail: ");
-        Serial.println(state[i].navail);
         writeDBindi(Z_SYN_FAIL_1+i, state[i].fail);
         writeDBindi(Z_SYN_NAVAIL_1+i, state[i].navail);
     }

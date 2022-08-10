@@ -113,7 +113,7 @@ SINT8 sendMessageUint64(UINT64 payload, MESSAGE_TYPE messageType){
  * recieves a message from a defined module connected to one of the Serial inputs
  *
  * @param moduleId defines from which module connected to Serial inputs 1-3 the message is read
- * @param buffer buffer in which the readed message is written
+ * @param buffer buffer in which the read message is written
  * @return -1 for transmission error and otherwise it returns the number of bytes placed in buffer
  */
 SINT8 receiveMessage(UINT8 moduleId, MESSAGE* buffer) {
@@ -193,7 +193,7 @@ void cyclicCheckMessages() {
  */
 void rs485Init(){
     // set Serial to output and activate
-    //pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
+    pinMode(RS485_ACTIVATION_PIN_OUT, OUTPUT);
 
     // set rs485 to read
     pinMode(RS485_ACTIVATION_PIN_IN_1, OUTPUT);
@@ -201,21 +201,20 @@ void rs485Init(){
     pinMode(RS485_ACTIVATION_PIN_IN_3, OUTPUT);
 
     // set rs485 to write (serial)
-    //digitalWrite(RS485_ACTIVATION_PIN_OUT, HIGH);
+    digitalWrite(RS485_ACTIVATION_PIN_OUT, HIGH);
 
     // set rs485 to read (serial1-3)
     digitalWrite(RS485_ACTIVATION_PIN_IN_1, LOW);
     digitalWrite(RS485_ACTIVATION_PIN_IN_2, LOW);
-    digitalWrite(RS485_ACTIVATION_PIN_IN_3, HIGH);
+    digitalWrite(RS485_ACTIVATION_PIN_IN_3, LOW);
 
 
-  //  Serial.setTimeout(RS485_TIMEOUT);
+    Serial.setTimeout(RS485_TIMEOUT);
     Serial1.setTimeout(RS485_TIMEOUT);
     Serial2.setTimeout(RS485_TIMEOUT);
     Serial3.setTimeout(RS485_TIMEOUT);
 
-    //Serial.begin(RS485_BAUD_RATE);
-
+    Serial.begin(RS485_BAUD_RATE);
     Serial1.begin(RS485_BAUD_RATE);
     Serial2.begin(RS485_BAUD_RATE);
     Serial3.begin(RS485_BAUD_RATE);
