@@ -10,10 +10,11 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <pinprog.h>
+#include <Servo.h>
 
 #define NUM_JOBS 6
 #define NUM_INIT_JOBS 8
-
+Servo servo;
 T_JOB *activeJobTable;
 long numJobs;
 
@@ -22,7 +23,7 @@ long numJobs;
  *
  * @param data data with type char* to be printed
  */
-void logData(char* data) {
+void logData(char *data) {
     Serial.println(data);
 }
 
@@ -39,28 +40,21 @@ void logData(int data) {
  * turns on an LED attached to digital Pin 45,47,49 if Z_SYN_NAVAIL of module 1-3 is false
  */
 void led_high() {
-    if(readDBindi(Z_SYN_NAVAIL_1) == 0) {
-        digitalWrite(47, HIGH);
-    } else {
-        digitalWrite(47, LOW);
-    }
-    if(readDBindi(Z_SYN_NAVAIL_2) == 0) {
-        digitalWrite(49, HIGH);
-    } else {
-        digitalWrite(49, LOW);
-    }
-    if(readDBindi(Z_SYN_NAVAIL_3) == 0) {
+    int ledState = 0;
+    ledState = readDBindi(SENSOR_1);
+    if (ledState > 50)
         digitalWrite(45, HIGH);
-    } else {
-        digitalWrite(45, LOW);
-    }
+    if (ledState > 200)
+        digitalWrite(47, HIGH);
+    if (ledState > 500)
+        digitalWrite(49, HIGH);
 
 }
 
 void led_low() {
-//    digitalWrite(45, LOW);
-    //digitalWrite(47, LOW);
-    //digitalWrite(49, LOW);
+    digitalWrite(45, LOW);
+    digitalWrite(47, LOW);
+    digitalWrite(49, LOW);
 }
 
 /**
@@ -71,13 +65,16 @@ void initSerial() {
     //Serial.write("standardSerial");
 
 }
+
 /**
  * analog read of analog pin A2 and prints the result to the Serial monitor
  */
 void readPoti() {
     int val = 17;
     val = analogRead(A2);
-    Serial.print(val);
+    Serial.println(val);
+    writeDBindi(SENSOR_1, val);
+    servo.write(val / 2);
 }
 
 /**
@@ -94,6 +91,7 @@ void initLed() {
  * defines analog Pin A2 as input (to connect a poti)
  */
 void initPoti() {
+    servo.attach(44);
     pinMode(A2, INPUT);
 }
 
@@ -107,7 +105,7 @@ void sendRs485() {
 /**
  * callback function to recieve messages from to other modules
  */
-void rcvRs485 (){
+void rcvRs485() {
     /*MESSAGE buf = getSamplingMessage(0, XCONMA);
     if(buf.payload.asUint == 4711) {
         led_high();
@@ -123,34 +121,35 @@ void rcvRs485 (){
  * Job Table for initialisation; to be run once
  */
 T_JOB initJobTable[NUM_INIT_JOBS] = {
-        {.start_time = 0, .stop_time = 0, .job_function = &initDB },
-        {.start_time = 100, .stop_time = 0, .job_function = &initSerial },
-        {.start_time = 100, .stop_time = 0, .job_function = &initPinProg },
-        {.start_time = 200, .stop_time = 0, .job_function = &initLed },
-        {.start_time = 300, .stop_time = 0, .job_function = &initPoti },
-        {.start_time = 400, .stop_time = 0, .job_function = &init_spy },
-        {.start_time = 500, .stop_time = 900, .job_function = &led_high },
-        {.start_time = 900, .stop_time = 0, .job_function = &rs485Init },
+        {.start_time = 0, .stop_time = 0, .job_function = &initDB},
+        {.start_time = 100, .stop_time = 0, .job_function = &initSerial},
+        {.start_time = 100, .stop_time = 0, .job_function = &initPinProg},
+        {.start_time = 200, .stop_time = 0, .job_function = &initLed},
+        {.start_time = 300, .stop_time = 0, .job_function = &initPoti},
+        {.start_time = 400, .stop_time = 0, .job_function = &init_spy},
+        {.start_time = 500, .stop_time = 900, .job_function = &led_high},
+        {.start_time = 900, .stop_time = 0, .job_function = &rs485Init},
 };
+const int scaler = 5;
 T_JOB runJobTable[NUM_JOBS] = {
-        {.start_time = 0, .stop_time = 50, .job_function = &sendRs485 },
-        {.start_time = 100, .stop_time = 150, .job_function = &rcvRs485 },
-        {.start_time = 200, .stop_time = 400, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 600, .job_function = &led_high },
-        {.start_time = 600, .stop_time = 800, .job_function = &led_low },
-        {.start_time = 800, .stop_time = 0, .job_function = &reset_time },
+        {.start_time = 0, .stop_time = scaler * 1, .job_function = &sendRs485},
+        {.start_time = 2 * scaler, .stop_time = 3 * scaler, .job_function = &rcvRs485},
+        {.start_time = 4 * scaler, .stop_time = 8 * scaler, .job_function = &led_low},
+        {.start_time = 8 * scaler, .stop_time = 12 * scaler, .job_function = &led_high},
+        {.start_time = 12 * scaler, .stop_time = 16 * scaler, .job_function = &led_low},
+        {.start_time = 16 * scaler, .stop_time = 18 * scaler, .job_function = &reset_time},
 };
 
 
 T_JOB runJobTable2[NUM_JOBS] = {
-        {.start_time = 0, .stop_time = 0, .job_function = &job_xsynchro },
-        {.start_time = 0, .stop_time = 0, .job_function = &reset_time },
-        {.start_time = 200, .stop_time = 0, .job_function = &led_high },
-        {.start_time = 300, .stop_time = 0, .job_function = &led_low },
-        {.start_time = 400, .stop_time = 0, .job_function = &step_spy },
-        {.start_time = 500, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 0, .stop_time = 1*scaler, .job_function = &job_xsynchro},
+        {.start_time = 0 * scaler, .stop_time = 4 * scaler, .job_function = &reset_time},
+        {.start_time = 4 * scaler, .stop_time = 6 * scaler, .job_function = &led_high},
+        //{.start_time = 300, .stop_time = 0, .job_function = &led_low },
+        {.start_time = 6 * scaler, .stop_time = 7 * scaler, .job_function = &readPoti},
+        {.start_time = 7 * scaler, .stop_time = 11 * scaler, .job_function = &step_spy}, // with minimum data, this needs 60us
+        {.start_time = 11 * scaler, .stop_time = 12 * scaler, .job_function = &led_low},
 };
-
 
 
 void setup() {
@@ -163,10 +162,14 @@ void setup() {
     activeJobTable = runJobTable2;
 }
 
+long processCounter = 0;
+
 void loop() {
 // write your code here
+    processCounter++;
     runScheduler(activeJobTable, numJobs);
-    Serial.println("Looping\n");
+    Serial.print("Looping ");
+    Serial.println(processCounter);
 
 }
 

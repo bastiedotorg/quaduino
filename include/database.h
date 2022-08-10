@@ -8,6 +8,7 @@
 extern long DATAPOOL[DATAPOOL_SIZE];
 
 void initDB();
+long getDB(long*);
 
 void writeDB(long position, long value);
 void writeDBindi(long position, long value);
@@ -37,6 +38,9 @@ enum DBPOSITIONS_INDI {
     Z_SYN_NAVAIL_3,
     Z_SYN_NAVAIL_4,
     X_XLANE,
+    SENSOR_1,
+    SENSOR_2,
+    SENSOR_3
 };
 
 

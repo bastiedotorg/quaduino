@@ -5,6 +5,7 @@
 #include "ostime.h"
 #include "rs485.h"
 #include "datatypes.h"
+#include <Arduino.h>
 
 #define NUM_LANES 4
 #define SYN_DEFAULT -1
@@ -35,6 +36,10 @@ typedef struct {
 SINT64 getSynMessage(int lane) {
     MESSAGE synMsg;
     receiveMessage(lane, &synMsg);
+    Serial.print("received message from: ");
+    Serial.print(lane);
+    Serial.print(" ");
+    Serial.println(synMsg.payload.asIntArray[0]);
     return synMsg.payload.asInt;
 }
 
@@ -112,15 +117,16 @@ void xsynchro(TT_STATUS *status, TT_STATE *zsyn) {
         }
     }
     for(i=0;i<NUM_LANES;i++) {
-        if(zsyn[i].fail == false) { // sf(i) hat korrekt synchronisiert
+        if (zsyn[i].fail) {
+            zsyn[i].navail = true;
+            if (xsyn[i] == SYN_DEFAULT) { // sf(i) hat kein xsyn gesendet -> stromlos
+                zsyn[i].fail = false;
+            } else { // sf(i) hat korrumpiertes xsyn gesendet
+                zsyn[i].fail = true;
+            }
+        } else { // sf(i) hat korrekt synchronisiert
             zsyn[i].navail = false;
             zsyn[i].fail = false;
-        } else if(zsyn[i].fail && xsyn[i] == SYN_DEFAULT) { // sf(i) hat kein xsyn gesendet -> stromlos
-            zsyn[i].navail = true;
-            zsyn[i].fail = false;
-        } else { // sf(i) hat korrumpiertes xsyn gesendet
-            zsyn[i].navail = true;
-            zsyn[i].fail = true;
         }
     }
 }
@@ -136,8 +142,16 @@ void job_xsynchro() {
         status[i].off = readDBcss(STATUS_OFF_1 + i);
         status[i].iso = readDBcss(STATUS_ISO_1 + i);
     }
+    status[2].off = 1;
+    status[3].off = 1;
     xsynchro(status, state);
     for (i = 0; i < NUM_LANES; i++) {
+        Serial.print("syn end; i=");
+        Serial.print(i);
+        Serial.print(" fail: ");
+        Serial.print(state[i].fail);
+        Serial.print(" navail: ");
+        Serial.println(state[i].navail);
         writeDBindi(Z_SYN_FAIL_1+i, state[i].fail);
         writeDBindi(Z_SYN_NAVAIL_1+i, state[i].navail);
     }

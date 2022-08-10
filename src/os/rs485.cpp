@@ -82,8 +82,8 @@ UINT8 crc8(UINT8 const* data, UINT8 len)
  */
 SINT8 sendMessage(UINT8* message) {
     for(UINT8 i=0;i<MESSAGE_LENGTH;i++) {
-        if(Serial3.availableForWrite() > 0) {
-            Serial3.write(message[i]);
+        if(Serial1.availableForWrite() > 0) {
+            Serial1.write(message[i]);
         } else {
             Serial.println("error!");
             return TRANSMIT_ERR;
@@ -122,13 +122,13 @@ SINT8 receiveMessage(UINT8 moduleId, MESSAGE* buffer) {
 
     switch(moduleId) {
         case MODULE_1:
-            return Serial1.readBytes((SINT8*) buffer, MESSAGE_LENGTH);
-            break;
-        case MODULE_2:
             return Serial2.readBytes((SINT8*) buffer, MESSAGE_LENGTH);
             break;
-        case MODULE_3:
+        case MODULE_2:
             return Serial3.readBytes((SINT8*) buffer, MESSAGE_LENGTH);
+            break;
+        case MODULE_3:
+            return Serial.readBytes((SINT8*) buffer, MESSAGE_LENGTH);
             break;
         default:
             return TRANSMIT_ERR;

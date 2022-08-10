@@ -9,16 +9,16 @@
 /**
  * defines the input (digital) pins for pinprog
  */
-#define PIN_PROG_1 36
-#define PIN_PROG_2 38
-#define PIN_PROG_3 40
+#define PIN_PROG_1 22
+#define PIN_PROG_2 24
+#define PIN_PROG_3 26
 
 /**
  * digital pins to which the corresponding input pins are connected if they are setted to high
  */
-#define PIN_PROG_PWR_1 35
-#define PIN_PROG_PWR_2 37
-#define PIN_PROG_PWR_3 39
+#define PIN_PROG_PWR_1 23
+#define PIN_PROG_PWR_2 25
+#define PIN_PROG_PWR_3 27
 
 void initPinProg();
 SINT8 getModuleId();

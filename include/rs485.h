@@ -7,10 +7,10 @@
 
 #include "datatypes.h"
 
-#define RS485_ACTIVATION_PIN_OUT    5   //RS485 Modul an RX/TX
-#define RS485_ACTIVATION_PIN_IN_1   2   //RS485 Modul an RX1/TX1
-#define RS485_ACTIVATION_PIN_IN_2   3   //RS485 Modul an RX2/TX2
-#define RS485_ACTIVATION_PIN_IN_3   4   //Rs485 Modul an RX3/TX3
+#define RS485_ACTIVATION_PIN_IN_3    5   //RS485 Modul an RX/TX
+#define RS485_ACTIVATION_PIN_OUT   2   //RS485 Modul an RX1/TX1
+#define RS485_ACTIVATION_PIN_IN_1   3   //RS485 Modul an RX2/TX2
+#define RS485_ACTIVATION_PIN_IN_2   4   //Rs485 Modul an RX3/TX3
 
 /**
  *message length in byte
@@ -49,6 +49,7 @@ typedef struct {
         SINT64 asInt;
         SINT8 asString[8];
         FLOAT64 asFloat;
+        SINT32 asIntArray[2];
     } payload;
     MESSAGE_TYPE messageType; // should be uint8
     MESSAGE_STATUS messageStatus;

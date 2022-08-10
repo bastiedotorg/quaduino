@@ -5,6 +5,11 @@
 
 long DATAPOOL[DATAPOOL_SIZE];
 
+long getDB(long* target) {
+    target = DATAPOOL;
+    return DATAPOOL_SIZE;
+}
+
 /**
  * writes data to the database at a certain position
  *
